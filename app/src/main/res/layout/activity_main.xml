@@ -31,18 +31,59 @@
                 android:layout_height="wrap_content"/>
 
 
-            <EditText
-                android:id="@+id/edt_address"
+<!--            <EditText-->
+<!--                android:id="@+id/edt_address"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:hint="My Home"-->
+<!--                ></EditText>-->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="My Home"
-                ></EditText>
-            <EditText
-                android:id="@+id/edt_place_likelihoods"
+                android:layout_height="50dp"
+                android:layout_marginTop="38dp"
+                android:id="@+id/search_layout"
+                android:gravity="center_horizontal">
+
+                <EditText
+                    android:id="@+id/search_box"
+                    android:layout_width="200dp"
+                    android:layout_height="39dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginRight="6dp"
+                    android:layout_marginBottom="58dp"
+                    android:ems="10"
+                    android:hint="Search activities"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    />
+
+                <SearchView
+                    android:layout_width="45dp"
+                    android:layout_height="39dp"
+                    android:id="@+id/search_button" android:layout_marginLeft="6dp" android:layout_marginStart="6dp"
+                 />
+                <Spinner
+                    android:layout_width="100dp"
+                    android:layout_height="39dp"
+                    android:hint = "Sort by"
+                    android:gravity="center_horizontal">
+                </Spinner>
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="My Home"
-                ></EditText>
+                android:layout_height="550dp"
+                android:id = "@+id/recyclerView">
+            </androidx.recyclerview.widget.RecyclerView>
+<!--            <EditText-->
+<!--                android:id="@+id/edt_place_likelihoods"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:hint="My Home"-->
+<!--                ></EditText>-->
 
         </LinearLayout>
     </ScrollView>
