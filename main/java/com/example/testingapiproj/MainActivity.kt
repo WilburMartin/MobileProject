@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.Observer
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,6 +27,6 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        viewModel.getCategories("London");
+        viewModel.getWeatherByCity("London");
     }
 }

@@ -9,8 +9,11 @@ class WeatherViewModel (application: Application): AndroidViewModel(application)
     public var weatherList: MutableLiveData<CityWeather> = MutableLiveData()
     public var weatherRepository: WeatherRepository = WeatherRepository()
 
-    fun getCategories(city: String) {
-        weatherRepository.getCategories(weatherList, city)
+    fun getWeatherByCity(city: String) {
+        weatherRepository.getWeatherByCity(weatherList, city)
+    }
+    fun getWeatherByCoords(lat: String, lon: String) {
+        weatherRepository.getWeatherByCoords(weatherList, lat, lon)
     }
 
 }
