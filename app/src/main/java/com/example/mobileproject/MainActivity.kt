@@ -36,8 +36,8 @@ class MainActivity : AppCompatActivity()  {
 
     lateinit var placesClient:PlacesClient
     var sortablePlaces: ArrayList<PlaceLikelihood> = ArrayList<PlaceLikelihood>()
-    lateinit var searchButton: SearchView
-    lateinit var searchBox: EditText
+//    lateinit var searchButton: SearchView
+//    lateinit var searchBox: EditText
     lateinit var viewModel: ActivityViewModel
     var placesList: ArrayList<NearbySearch> = ArrayList<NearbySearch>()
     var activityList: ArrayList<activity> = ArrayList<activity>()
@@ -55,8 +55,8 @@ class MainActivity : AppCompatActivity()  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        searchButton = search_button
-        searchBox=search_box
+//        searchButton = search_button
+//        searchBox= search_box
         viewModel = ViewModelProviders.of(this).get(ActivityViewModel::class.java)
 
         requestPermission()
@@ -156,20 +156,20 @@ class MainActivity : AppCompatActivity()  {
             })
             //autofill the recycler view on creation
 
-            viewModel.getNearbySearch(currentPlaceCoordinates, searchRadius, "bar", apiKey)
+            viewModel.getNearbySearch(currentPlaceCoordinates, searchRadius, "restaurant", apiKey)
 
 
             //click listener for when search button is pressed from edit text
-            searchBox.setOnEditorActionListener() { v, actionId, event ->
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    //your code here
-                    val input: String = searchBox.text.toString()
-                    //viewModel!!.getNearbyBySearch(apiKey, currentPlaceCoordinates, searchRadius)
-                    true
-                }
-                false
-
-            }
+//            searchBox.setOnEditorActionListener() { v, actionId, event ->
+//                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+//                    //your code here
+//                    val input: String = searchBox.text.toString()
+//                    viewModel!!.getNearbySearch(currentPlaceCoordinates, searchRadius, input, apiKey)
+//                    true
+//                }
+//                false
+//
+//            }
         }
     }
 

@@ -13,7 +13,7 @@ interface PlacesInterface {
         suspend fun getNearbySearch(
                 @Query("location") location: String,
                 @Query("radius") radius: String,
-                @Query("type") types: String,
+                @Query("keyword") keyword: String,
                 @Query("key") key: String
         ):Response<NearbySearch>
 }

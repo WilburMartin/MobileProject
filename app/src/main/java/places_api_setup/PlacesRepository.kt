@@ -14,11 +14,11 @@ class PlacesRepository {
     val service = PlacesClient.makeRetrofitService()
 
     //searches for breweries based on string value
-    fun getNearbySearch(resBody : MutableLiveData<NearbySearch>, location: String, radius: String, type: String, key: String ){
+    fun getNearbySearch(resBody : MutableLiveData<NearbySearch>, location: String, radius: String, keyword: String, key: String ){
         //set the coroutine on a background thread
         CoroutineScope(Dispatchers.IO).launch {
               var response: Response<NearbySearch>
-                response =  service.getNearbySearch(location, radius, type, key)
+                response =  service.getNearbySearch(location, radius, keyword, key)
 
             //when the coroutine finishes
             withContext(Dispatchers.Main){

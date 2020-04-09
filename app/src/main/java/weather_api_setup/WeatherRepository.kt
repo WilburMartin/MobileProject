@@ -17,9 +17,24 @@ class WeatherRepository {
 
     val service = ApiClient.makeRetrofitService()
 
-    fun getCategories(resBody: MutableLiveData<CityWeather>, city: String) {
+    fun getWeatherByCity(resBody: MutableLiveData<CityWeather>, city: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            val response = service.getCategories(city, id)
+            val response = service.getWeatherByCity(city, id)
+
+            withContext(Dispatchers.Main) {
+                try{
+                    if(response.isSuccessful) {
+                        resBody.value = response.body()
+                    }
+                } catch (e: HttpException) {
+                    println("Http error")
+                }
+            }
+        }
+    }
+    fun getWeatherByCoords(resBody: MutableLiveData<CityWeather>, lat: String, lon: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val response = service.getWeatherByCoords(lat, lon, id)
 
             withContext(Dispatchers.Main) {
                 try{
