@@ -10,7 +10,8 @@ data class localactivity (
     val name: String,
     @ColumnInfo(name = "address")
     val address: String,
-    val type: String
+    val type: String,
+    val distance: Double
 
 )
 {

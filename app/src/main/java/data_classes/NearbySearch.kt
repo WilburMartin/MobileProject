@@ -23,7 +23,8 @@ data class activity (
     //val result: Result,
     val name: String,
     val type: String,
-    val formatted_address: String
+    val formatted_address: String,
+    val distance: Double
 )
 
 data class NearbyResponsePayload(val response_code: Int, val data: List<NearbySearch>)

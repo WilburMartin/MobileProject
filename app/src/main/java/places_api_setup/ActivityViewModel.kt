@@ -3,6 +3,7 @@ package places_api_setup
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import com.google.android.gms.maps.model.LatLng
 import data_classes.NearbySearch
 
 class ActivityViewModel(application: Application): AndroidViewModel(application) {

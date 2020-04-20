@@ -1,5 +1,6 @@
 package places_api_setup
 
+import com.google.android.gms.maps.model.LatLng
 import data_classes.NearbySearch
 import retrofit2.Response
 import retrofit2.http.GET
