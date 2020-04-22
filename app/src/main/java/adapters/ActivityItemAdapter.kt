@@ -42,7 +42,6 @@ class ActivityViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         activityNameView.setOnClickListener({
             val context = itemView.getContext()
             val intent = Intent(context, ViewSingleActivity::class.java)
-            val activity = activity.
             intent!!.putExtra("place_id", activity.place_id)
             context.startActivity(intent)
         })

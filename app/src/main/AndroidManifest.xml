@@ -13,7 +13,9 @@
 
         android:theme="@style/AppTheme">
         <activity android:name=".LocalStorageActivity"/>
+        <activity android:name = ".ViewSingleActivity"/>
         <activity android:name="com.example.mobileproject.MainActivity">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

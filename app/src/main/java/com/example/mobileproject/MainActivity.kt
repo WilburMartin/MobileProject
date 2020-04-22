@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     var placesList: ArrayList<NearbySearch> = ArrayList<NearbySearch>()
     var activityList: ArrayList<activity> = ArrayList<activity>()
     var questionList: ArrayList<CityWeather> = ArrayList()
-
+    var reload: Boolean=true
     internal var placeId = ""
     lateinit var currentPlaceCoordinates:LatLng
      var currentPlaceLat = 0.0
@@ -114,6 +114,10 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
         setupCurrentPlace()
 
+        if (intent != null && intent.getExtras() != null) {
+            reload = intent!!.getBooleanExtra("reload", true)
+        }
+
         goToLocalActivities.setOnClickListener() {
             val intent = Intent(this, LocalStorageActivity::class.java)
             startActivity(intent)
@@ -124,6 +128,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private fun partItemClicked(activity: activity) {
         var localactivity= localactivity(activity.name, activity.formatted_address, activity.type, activity.distance)
         localStorageViewModel.insert(localactivity)
+        Toast.makeText(this, "Activity stored", Toast.LENGTH_SHORT)
     }
     override fun onItemSelected(arg0: AdapterView<*>, arg1: View, position: Int, id: Long) {
         var result = sort[position]
@@ -165,12 +170,15 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     }
 
     private fun setupCurrentPlace() {
-        placesList.clear()
-        activityList.clear()
+        if (reload) {
+            placesList.clear()
+            activityList.clear()
+        }
         val request = FindCurrentPlaceRequest.builder(placeFields).build()
         btn_get_current_place.setOnClickListener {
             if(ActivityCompat.checkSelfPermission(this@MainActivity,
                     android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                reload = true
                 return@setOnClickListener;
             }
             val placeResponse = placesClient.findCurrentPlace(request)
@@ -394,7 +402,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                         var distanceInMilesFloat = (currentLocation.distanceTo(calcLocation)/1609);
                         var distanceInMiles = "%.2f".format(distanceInMilesFloat).toDouble()
                         println("Distance in miles: " + distanceInMiles)
-                        var activity = activity(result.name, result.types.component1(), result.vicinity, distanceInMiles, result.photos, result.opening_hours, result.place_id)
+                        var activity = activity(result.name, result.types.component1(), result.vicinity, distanceInMiles, result.place_id)
 
 
                         var outdoorActivit = false;

@@ -45,6 +45,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Search Activities"
+        android:layout_centerHorizontal="true"
+        android:id = "@+id/back_button"
         android:layout_alignBottom="@id/recyclerView">
 
     </Button>

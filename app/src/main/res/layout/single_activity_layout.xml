@@ -5,6 +5,8 @@
     android:layout_height="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
     >
+
+
     <TextView
         android:id="@+id/activity_name"
         android:layout_width="wrap_content"
@@ -39,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/activity_image"
+        app:layout_constraintTop_toBottomOf="@+id/formatted_address"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginLeft="85dp" android:layout_marginStart="85dp" app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="84dp" android:layout_marginRight="84dp" android:layout_marginBottom="70dp"/>
@@ -48,16 +50,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/activity_image"
+        app:layout_constraintTop_toBottomOf="@+id/formatted_address"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginLeft="85dp" android:layout_marginStart="85dp" app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="84dp" android:layout_marginRight="84dp" android:layout_marginBottom="70dp"/>
     <TextView
-        android:id="@+id/opening_hours"
+        android:id="@+id/website"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16dp"
+        android:clickable="true"
         app:layout_constraintTop_toBottomOf="@id/type"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginLeft="85dp" android:layout_marginStart="85dp" app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="84dp" android:layout_marginRight="84dp" android:layout_marginBottom="70dp"/>
+    <TextView
+        android:id="@+id/phone_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        app:layout_constraintTop_toBottomOf="@id/website"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginLeft="85dp" android:layout_marginStart="85dp" app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="84dp" android:layout_marginRight="84dp" android:layout_marginBottom="70dp"/>
@@ -66,7 +78,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16dp"
-        app:layout_constraintTop_toBottomOf="@id/opening_hours"
+        app:layout_constraintTop_toBottomOf="@id/phone_number"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginLeft="85dp" android:layout_marginStart="85dp" app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="84dp" android:layout_marginRight="84dp" android:layout_marginBottom="70dp"/>
