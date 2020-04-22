@@ -22,9 +22,9 @@ class LocalActivityRepository(private val localActivityDao: LocalActivityDao) {
         }
     }
 
-//    fun delete(localactivity: localactivity) {
-//        CoroutineScope(Dispatchers.IO).launch {
-//            localActivityDao.delete(localactivity)
-//        }
-//    }
+    fun delete(localactivity: localactivity) {
+        CoroutineScope(Dispatchers.IO).launch {
+            localActivityDao.delete(localactivity)
+        }
+    }
 }

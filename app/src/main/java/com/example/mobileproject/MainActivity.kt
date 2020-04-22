@@ -1,5 +1,7 @@
 package com.example.mobileproject
 import adapters.ActivityViewHolder
+import adapters.LocalStorageViewHolder
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
@@ -34,6 +36,8 @@ import data_classes.Geometry
 import data_classes.NearbySearch
 import data_classes.activity
 import kotlinx.android.synthetic.main.activity_main.*
+import local_database.LocalActivityViewModel
+import local_database.localactivity
 import weather_api_setup.CityWeather
 import weather_api_setup.WeatherViewModel
 import java.lang.StringBuilder
@@ -49,6 +53,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     lateinit var spinner: Spinner
     lateinit var viewModel: ActivityViewModel
     lateinit var weatherView: WeatherViewModel
+    lateinit var localStorageViewModel: LocalActivityViewModel
 
     var placesList: ArrayList<NearbySearch> = ArrayList<NearbySearch>()
     var activityList: ArrayList<activity> = ArrayList<activity>()
@@ -62,6 +67,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     lateinit var adapter: ActivityViewHolder.ActivityItemAdapter
     internal var searchRadius = "50000"
     internal var apiKey = "AIzaSyAlI0k8ZhRZuywIpOHH0_9ls5a0JhyF1Pg"
+
+    lateinit var goToLocalActivities:Button
 
     //Weather check variables
     var weatherStat = arrayOf<Boolean>(
@@ -87,10 +94,11 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         setContentView(R.layout.activity_main)
 //        searchButton = search_button
 //        searchBox= search_box
+        goToLocalActivities = findViewById(R.id.go_to_stored)
         viewModel = ViewModelProviders.of(this).get(ActivityViewModel::class.java)
         weatherView = ViewModelProviders.of(this).get(WeatherViewModel::class.java)
-
-        adapter = ActivityViewHolder.ActivityItemAdapter(activityList as ArrayList<activity>)
+        localStorageViewModel=ViewModelProviders.of(this).get(LocalActivityViewModel::class.java)
+        adapter = ActivityViewHolder.ActivityItemAdapter(activityList as ArrayList<activity>, {activity: activity->partItemClicked(activity)})
         spinner = findViewById(R.id.sort_spinner)
         spinner.onItemSelectedListener = this
         val aa = ArrayAdapter(this, android.R.layout.simple_spinner_item, sort)
@@ -106,6 +114,16 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
         setupCurrentPlace()
 
+        goToLocalActivities.setOnClickListener() {
+            val intent = Intent(this, LocalStorageActivity::class.java)
+            startActivity(intent)
+        }
+
+    }
+
+    private fun partItemClicked(activity: activity) {
+        var localactivity= localactivity(activity.name, activity.formatted_address, activity.type, activity.distance)
+        localStorageViewModel.insert(localactivity)
     }
     override fun onItemSelected(arg0: AdapterView<*>, arg1: View, position: Int, id: Long) {
         var result = sort[position]
@@ -148,6 +166,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     private fun setupCurrentPlace() {
         placesList.clear()
+        activityList.clear()
         val request = FindCurrentPlaceRequest.builder(placeFields).build()
         btn_get_current_place.setOnClickListener {
             if(ActivityCompat.checkSelfPermission(this@MainActivity,
@@ -375,7 +394,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                         var distanceInMilesFloat = (currentLocation.distanceTo(calcLocation)/1609);
                         var distanceInMiles = "%.2f".format(distanceInMilesFloat).toDouble()
                         println("Distance in miles: " + distanceInMiles)
-                        var activity = activity(result.name, result.types.component1(), result.vicinity, distanceInMiles)
+                        var activity = activity(result.name, result.types.component1(), result.vicinity, distanceInMiles, result.photos, result.opening_hours, result.place_id)
 
 
                         var outdoorActivit = false;

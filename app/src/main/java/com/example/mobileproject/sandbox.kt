@@ -16,14 +16,14 @@ package com.example.mobileproject
 //
 //    override fun onCreate(savedInstanceState: Bundle?) {
 //        super.onCreate(savedInstanceState)
-//        setContentView(R.layout.activity_main)
+//        setContentView(R.single_activity_layout.activity_main)
 //        //Getting the instance of Spinner and applying OnItemSelectedListener on it
 //        val spin = findViewById(R.id.sort_spinner) as Spinner
 //        spin.onItemSelectedListener = this
 //
 //        //Creating the ArrayAdapter instance having the country list
-//        val aa = ArrayAdapter(this, android.R.layout.simple_spinner_item, country)
-//        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//        val aa = ArrayAdapter(this, android.R.single_activity_layout.simple_spinner_item, country)
+//        aa.setDropDownViewResource(android.R.single_activity_layout.simple_spinner_dropdown_item)
 //        //Setting the ArrayAdapter data on the Spinner
 //        spin.adapter = aa
 //

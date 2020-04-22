@@ -22,6 +22,10 @@ class LocalActivityViewModel(application:Application):AndroidViewModel(applicati
         repository.insert(localactivity)
     }
 
+    fun delete(localactivity: localactivity) {
+        repository.delete(localactivity)
+    }
+
     fun clear() {
         repository.clear()
     }
