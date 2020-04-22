@@ -34,6 +34,8 @@ import data_classes.Geometry
 import data_classes.NearbySearch
 import data_classes.activity
 import kotlinx.android.synthetic.main.activity_main.*
+import weather_api_setup.CityWeather
+import weather_api_setup.WeatherViewModel
 import java.lang.StringBuilder
 import java.util.*
 import kotlin.collections.ArrayList
@@ -46,8 +48,12 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 //    lateinit var searchBox: EditText
     lateinit var spinner: Spinner
     lateinit var viewModel: ActivityViewModel
+    lateinit var weatherView: WeatherViewModel
+
     var placesList: ArrayList<NearbySearch> = ArrayList<NearbySearch>()
     var activityList: ArrayList<activity> = ArrayList<activity>()
+    var questionList: ArrayList<CityWeather> = ArrayList()
+
     internal var placeId = ""
     lateinit var currentPlaceCoordinates:LatLng
      var currentPlaceLat = 0.0
@@ -56,6 +62,19 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     lateinit var adapter: ActivityViewHolder.ActivityItemAdapter
     internal var searchRadius = "50000"
     internal var apiKey = "AIzaSyAlI0k8ZhRZuywIpOHH0_9ls5a0JhyF1Pg"
+
+    //Weather check variables
+    var weatherStat = arrayOf<Boolean>(
+        true, //weatherStat[0]: Is Temperature in Range (60 degrees to 90 degrees)
+        true, //weatherStat[1]: Is Wind in Range (60 degrees to 90 degrees)
+        true, //weatherStat[2]: Is it not Raining or Snowing?
+        true  //weatherStat[3]: Other conditions
+    )
+    var outdoorWeather = true; //Is the weather good for outdoors?
+    var tempLowBound = 289; //In Kelvin. 60 degrees Fahrenheit by default
+    var tempHighBound = 300; //In Kelvin. 80 degrees Fahrenheit by default
+    var windHighBound = 18; //In m/s. 40 mph by default.
+
 
     var placeFields = arrayListOf(Place.Field.ID,
         Place.Field.NAME,
@@ -69,6 +88,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 //        searchButton = search_button
 //        searchBox= search_box
         viewModel = ViewModelProviders.of(this).get(ActivityViewModel::class.java)
+        weatherView = ViewModelProviders.of(this).get(WeatherViewModel::class.java)
+
         adapter = ActivityViewHolder.ActivityItemAdapter(activityList as ArrayList<activity>)
         spinner = findViewById(R.id.sort_spinner)
         spinner.onItemSelectedListener = this
@@ -178,10 +199,161 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             }
         }
     }
+    private fun checkWeather(): Boolean{
+        var i: Int = 0;
+        var comma: Char = ',';
+        //var xCoord: String = currentPlaceCoordinates.substring(0,currentPlaceCoordinates.indexOf(comma));
+        //var yCoord: String = currentPlaceCoordinates.substring(currentPlaceCoordinates.indexOf(comma) + 1);
+        var xCoord: String = "" + currentPlaceLat;
+        var yCoord: String = "" + currentPlaceLong;
+        weatherView.getWeatherByCoords(xCoord,yCoord);
+
+
+        weatherView!!.weatherList.observe(this, Observer {
+            questionList.clear()
+            questionList.add(it)
+            var main = questionList.get(0).weather.get(0).main;
+            var wind = questionList.get(0).wind.speed;
+            var temp = questionList.get(0).main.temp;
+
+            //Checks Temperature
+            if(temp <= tempHighBound && temp >= tempLowBound){
+                weatherStat[0] = true;
+            }else{
+                weatherStat[0] = false;
+                outdoorWeather = false;
+            }
+
+            //Checks Wind Speed
+            if(wind <= windHighBound){
+                weatherStat[1] = true;
+            }else{
+                weatherStat[1] = false;
+                outdoorWeather = false;
+            }
+
+
+            //Checks for Rain/Snow/Extreme/Sleet weather
+
+            if(main.equals("Extreme") || main.equals("Rain") || main.equals("Snow") || main.equals("Sleet")){
+                weatherStat[2] = false;
+                outdoorWeather = false;
+            }else{
+                weatherStat[3] = true;
+            }
+        })
+        return outdoorWeather;
+    }
+    private fun checkActivityType(activType: String): Boolean{
+        var outdoorActivit: Boolean = false;
+        outdoorActivit = when(activType) {
+            "accounting" -> false
+            "airport" -> false
+            "amusement_park" -> true
+            "aquarium" -> false
+            "art_gallery" -> false
+            "atm" -> false
+            "bakery" -> false
+            "bank" -> false
+            "bar" -> false
+            "beauty_salon" -> false
+            "bicycle_store" -> false
+            "book_store" -> false
+            "bowling_alley" -> false
+            "bus_station" -> false
+            "cafe" -> false
+            "campground" -> true
+            "car_dealer" -> false
+            "car_rental" -> false
+            "car_repair" -> false
+            "car_wash" -> false
+            "casino" -> false
+            "cemetery" -> true
+            "church" -> false
+            "city_hall" -> false
+            "clothing_store" -> false
+            "convenience_store" -> false
+            "courthouse" -> false
+            "dentist" -> false
+            "department_store" -> false
+            "doctor" -> false
+            "drugstore" -> false
+            "electrician" -> false
+            "electronics_store" -> false
+            "embassy" -> false
+            "fire_station" -> false
+            "florist" -> false
+            "funeral_home" -> false
+            "furniture_store" -> false
+            "gas_station" -> false
+            "grocery_or_supermarket" -> false
+            "gym" -> false
+            "hair_care" -> false
+            "hardware_store" -> false
+            "hindu_temple" -> false
+            "home_goods_store" -> false
+            "hospital" -> false
+            "insurance_agency" -> false
+            "jewelry_store" -> false
+            "laundry" -> false
+            "lawyer" -> false
+            "library" -> false
+            "light_rail_station" -> false
+            "liquor_store" -> false
+            "local_government_office" -> false
+            "locksmith" -> false
+            "lodging" -> false
+            "meal_delivery" -> false
+            "meal_takeaway" -> false
+            "mosque" -> false
+            "movie_rental" -> false
+            "movie_theater" -> false
+            "moving_company" -> false
+            "museum" -> false
+            "night_club" -> false
+            "painter" -> false
+            "park" -> true
+            "parking" -> false
+            "pet_store" -> false
+            "pharmacy" -> false
+            "physiotherapist" -> false
+            "plumber" -> false
+            "police" -> false
+            "post_office" -> false
+            "primary_school" -> false
+            "real_estate_agency" -> false
+            "restaurant" -> false
+            "roofing_contractor" -> false
+            "rv_park" -> false
+            "school" -> false
+            "secondary_school" -> false
+            "shoe_store" -> false
+            "shopping_mall" -> false
+            "spa" -> false
+            "stadium" -> false
+            "storage" -> false
+            "store" -> false
+            "subway_station" -> false
+            "supermarket" -> false
+            "synagogue" -> false
+            "taxi_stand" -> false
+            "tourist_attraction" -> false
+            "train_station" -> false
+            "transit_station" -> false
+            "travel_agency" -> false
+            "university" -> false
+            "veterinary_care" -> false
+            "zoo" -> true
+            else -> false
+        }
+        return outdoorActivit;
+
+    }
 
     private fun getNearbyActivities() {
         //set recycler view
         //placesList.clear()
+        checkWeather();
         var index = 0;
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.adapter = adapter
@@ -204,7 +376,16 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                         var distanceInMiles = "%.2f".format(distanceInMilesFloat).toDouble()
                         println("Distance in miles: " + distanceInMiles)
                         var activity = activity(result.name, result.types.component1(), result.vicinity, distanceInMiles)
-                        activityList.add(activity)
+
+
+                        var outdoorActivit = false;
+                        outdoorActivit = checkActivityType(activity.type);
+                        if(!outdoorActivit || outdoorWeather){
+                            activityList.add(activity)
+                        }
+
+
+                      //activityList.add(activity)
                         println(activityList.toString())
                     }
                 }
