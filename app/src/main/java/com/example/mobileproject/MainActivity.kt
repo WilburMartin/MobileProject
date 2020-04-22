@@ -1,5 +1,6 @@
 package com.example.mobileproject
 import adapters.ActivityViewHolder
+import adapters.RecyclerViewClickListener
 import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
@@ -69,7 +70,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 //        searchButton = search_button
 //        searchBox= search_box
         viewModel = ViewModelProviders.of(this).get(ActivityViewModel::class.java)
-        adapter = ActivityViewHolder.ActivityItemAdapter(activityList as ArrayList<activity>)
+        adapter = ActivityViewHolder.ActivityItemAdapter(activityList as ArrayList<activity>, {activity: activity->partItemClicked(activity)})
         spinner = findViewById(R.id.sort_spinner)
         spinner.onItemSelectedListener = this
         val aa = ArrayAdapter(this, android.R.layout.simple_spinner_item, sort)
@@ -85,6 +86,11 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
         setupCurrentPlace()
 
+    }
+
+
+    private fun partItemClicked(activity: activity) {
+        Toast.makeText(this, "Clicked: ${activity.name}", Toast.LENGTH_LONG).show()
     }
     override fun onItemSelected(arg0: AdapterView<*>, arg1: View, position: Int, id: Long) {
         var result = sort[position]
@@ -181,9 +187,11 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     private fun getNearbyActivities() {
         //set recycler view
-        //placesList.clear()
+        placesList.clear()
+        activityList.clear()
         var index = 0;
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+
         recyclerView.adapter = adapter
         var layoutManager: LinearLayoutManager = LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
