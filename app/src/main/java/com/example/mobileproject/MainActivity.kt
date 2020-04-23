@@ -14,9 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.flexbox.FlexDirection
-import com.google.android.flexbox.FlexboxLayoutManager
-import com.google.android.flexbox.JustifyContent
+
 import places_api_setup.ActivityViewModel
 import com.google.android.gms.common.api.Status
 import com.google.android.gms.maps.model.LatLng
@@ -271,6 +269,109 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         })
         return outdoorWeather;
     }
+    private fun getActivityList(): Array<Pair<String,Boolean>>{
+        return arrayOf<Pair<String, Boolean>>(
+            Pair("accounting", false),
+            Pair("airport", false),
+            Pair("amusement_park", true),
+            Pair("aquarium" , false),
+            Pair("art_gallery" , false),
+            Pair("atm", false),
+            Pair("bakery", false),
+            Pair("bank", false),
+            Pair("bar", false),
+            Pair("beauty_salon" , false),
+            Pair("bicycle_store", false),
+            Pair("book_store" , false),
+            Pair("bowling_alley", false),
+            Pair("bus_station", false),
+            Pair("cafe", false),
+            Pair("campground", false),
+            Pair("car_dealer", false),
+            Pair("car_rental", false),
+            Pair("car_repair", false),
+            Pair("car_wash", false),
+            Pair("casino", false),
+            Pair("cemetery" , true),
+            Pair("church", false),
+            Pair("city_hall", false),
+            Pair("clothing_store" , false),
+            Pair("convenience_store" , false),
+            Pair("courthouse", false),
+            Pair("dentist", false),
+            Pair("department_store", false),
+            Pair("doctor", false),
+            Pair("drugstore", false),
+            Pair("electrician", false),
+            Pair("electronics_store", false),
+            Pair("embassy", false),
+            Pair("fire_station", false),
+            Pair("florist", false),
+            Pair("funeral_home", false),
+            Pair("furniture_store", false),
+            Pair("gas_station", false),
+            Pair("grocery_or_supermarket", false),
+            Pair("gym", false),
+            Pair("hair_care", false),
+            Pair("hardware_store", false),
+            Pair("hindu_temple", false),
+            Pair("home_goods_store", false),
+            Pair("hospital", false),
+            Pair("insurance_agency", false),
+            Pair("jewelry_store", false),
+            Pair("laundry", false),
+            Pair("lawyer", false),
+            Pair("library", false),
+            Pair("light_rail_station", false),
+            Pair("liquor_store", false),
+            Pair("local_government_office", false),
+            Pair("locksmith", false),
+            Pair("lodging", false),
+            Pair("meal_delivery", false),
+            Pair("meal_takeaway", false),
+            Pair("mosque", false),
+            Pair("movie_rental", false),
+            Pair("movie_theater", false),
+            Pair("moving_company", false),
+            Pair("museum", false),
+            Pair("night_club", false),
+            Pair("painter", false),
+            Pair("park", false),
+            Pair("parking", false),
+            Pair("pet_store", false),
+            Pair("pharmacy", false),
+            Pair("physiotherapist", false),
+            Pair("plumber", false),
+            Pair("police", false),
+            Pair("post_office", false),
+            Pair("primary_school", false),
+            Pair("real_estate_agency", false),
+            Pair("restaurant", false),
+            Pair("roofing_contractor", false),
+            Pair("rv_park", true),
+            Pair("school", false),
+            Pair("secondary_school", false),
+            Pair("shoe_store", false),
+            Pair("shopping_mall", false),
+            Pair("spa", false),
+            Pair("stadium", false),
+            Pair("storage", false),
+            Pair("store", false),
+            Pair("subway_station", false),
+            Pair("supermarket", false),
+            Pair("synagogue", false),
+            Pair("taxi_stand", false),
+            Pair("tourist_attraction", false),
+            Pair("train_station", false),
+            Pair("transit_station", false),
+            Pair("travel_agency", false),
+            Pair("university", false),
+            Pair("veterinary_care", false),
+            Pair("zoo", true)
+        )
+    }
+
+
     private fun checkActivityType(activType: String): Boolean{
         var outdoorActivit: Boolean = false;
         outdoorActivit = when(activType) {
@@ -351,7 +452,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             "real_estate_agency" -> false
             "restaurant" -> false
             "roofing_contractor" -> false
-            "rv_park" -> false
+            "rv_park" -> true
             "school" -> false
             "secondary_school" -> false
             "shoe_store" -> false
@@ -380,6 +481,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private fun getNearbyActivities() {
         //set recycler view
         //placesList.clear()
+
+
         checkWeather();
         var index = 0;
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
@@ -387,6 +490,9 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         var layoutManager: LinearLayoutManager = LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         var searchTypes :ArrayList<String> = ArrayList<String>()
+
+        var weatherCheckArray = getActivityList();
+
         searchTypes.add("restaurant")
         searchTypes.add("park")
         if (currentPlaceCoordinates != null) {
@@ -405,8 +511,16 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                         var activity = activity(result.name, result.types.component1(), result.vicinity, distanceInMiles, result.place_id)
 
 
+                        //Weather Code
+
                         var outdoorActivit = false;
-                        outdoorActivit = checkActivityType(activity.type);
+                        for(x in weatherCheckArray){
+                            if(activity.type == x.first){
+                                outdoorActivit = x.second;
+                            }
+                        }
+
+                        //outdoorActivit = checkActivityType(activity.type);
                         if(!outdoorActivit || outdoorWeather){
                             activityList.add(activity)
                         }
