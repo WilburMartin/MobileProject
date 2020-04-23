@@ -67,6 +67,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     lateinit var adapter: ActivityViewHolder.ActivityItemAdapter
     internal var searchRadius = "50000"
     internal var apiKey = "AIzaSyAlI0k8ZhRZuywIpOHH0_9ls5a0JhyF1Pg"
+    lateinit var weatherGood:TextView
 
     lateinit var goToLocalActivities:Button
 
@@ -92,7 +93,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-//        searchButton = search_button
+        weatherGood = display_weather
+
         searchBox= search_box
         goToLocalActivities = findViewById(R.id.go_to_stored)
         viewModel = ViewModelProviders.of(this).get(ActivityViewModel::class.java)
@@ -373,6 +375,12 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             "zoo" -> true
             else -> false
         }
+        if (outdoorWeather == true) {
+            weatherGood.text = "Weather good for outside activities today"
+        }
+        else{
+            weatherGood.text = "Indoor activities better today"
+        }
         return outdoorActivit;
 
     }
@@ -381,6 +389,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         //set recycler view
         //placesList.clear()
         checkWeather();
+
         var index = 0;
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.adapter = adapter

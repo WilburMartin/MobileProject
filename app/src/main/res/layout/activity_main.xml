@@ -31,6 +31,14 @@
             android:id ="@+id/go_to_stored">
 
         </Button>
+        <TextView
+            android:id="@+id/display_weather"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="24dp"
+            android:hint="Weather today"
+            ></TextView>
 
 
 <!--        <ImageView-->
@@ -56,6 +64,8 @@
             android:layout_marginTop="38dp"
             android:id="@+id/search_layout"
             android:gravity="center_horizontal">
+
+
 
             <EditText
                 android:id="@+id/search_box"
@@ -92,12 +102,6 @@
             android:layout_height="550dp"
             android:id = "@+id/recyclerView">
         </androidx.recyclerview.widget.RecyclerView>
-        <!--            <EditText-->
-        <!--                android:id="@+id/edt_place_likelihoods"-->
-        <!--                android:layout_width="match_parent"-->
-        <!--                android:layout_height="wrap_content"-->
-        <!--                android:hint="My Home"-->
-        <!--                ></EditText>-->
 
     </LinearLayout>
 
