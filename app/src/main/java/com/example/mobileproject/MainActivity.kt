@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
         initPlaces()
 
-        setupPlacesAutoComplete()
+       // setupPlacesAutoComplete()
 
         setupCurrentPlace()
 
@@ -453,22 +453,22 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
 
 
-    private fun setupPlacesAutoComplete() {
-        val autocompleteFragment = supportFragmentManager
-            .findFragmentById(R.id.fragment_place) as AutocompleteSupportFragment
-        autocompleteFragment.setPlaceFields(placeFields)
-
-        autocompleteFragment.setOnPlaceSelectedListener(object:PlaceSelectionListener{
-            override fun onPlaceSelected(p0: Place) {
-                Toast.makeText(this@MainActivity,"" + p0.address, Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onError(p0: Status) {
-                Toast.makeText(this@MainActivity,"" + p0.statusMessage, Toast.LENGTH_SHORT).show()
-            }
-
-        })
-    }
+//    private fun setupPlacesAutoComplete() {
+//        val autocompleteFragment = supportFragmentManager
+//            .findFragmentById(R.id.fragment_place) as AutocompleteSupportFragment
+//        autocompleteFragment.setPlaceFields(placeFields)
+//
+//        autocompleteFragment.setOnPlaceSelectedListener(object:PlaceSelectionListener{
+//            override fun onPlaceSelected(p0: Place) {
+//                Toast.makeText(this@MainActivity,"" + p0.address, Toast.LENGTH_SHORT).show()
+//            }
+//
+//            override fun onError(p0: Status) {
+//                Toast.makeText(this@MainActivity,"" + p0.statusMessage, Toast.LENGTH_SHORT).show()
+//            }
+//
+//        })
+//    }
 
     private fun initPlaces() {
         Places.initialize(this,apiKey)

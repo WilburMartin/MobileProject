@@ -27,7 +27,7 @@ class LocalStorageViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
     }
     fun bind(localactivity: localactivity, listener: (localactivity)->Unit) {
         activityNameView.text = localactivity.name
-        activityTypeView.text = localactivity.type
+        activityTypeView.text = localactivity.type.capitalize()
         activityLocationView.text = localactivity.address
         activityDistanceView.text = localactivity.distance.toString() + " miles away"
         deleteButton.setOnClickListener({
