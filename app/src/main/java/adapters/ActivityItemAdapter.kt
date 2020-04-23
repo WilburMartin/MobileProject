@@ -33,7 +33,7 @@ class ActivityViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
     }
     fun bind(activity: activity, listener: (activity)->Unit) {
         activityNameView.text = activity.name
-        activityTypeView.text = activity.type
+        activityTypeView.text = activity.type.capitalize()
         activityLocationView.text = activity.formatted_address
         activityDistanceView.text = activity.distance.toString() + " miles away"
         addButton.setOnClickListener({
