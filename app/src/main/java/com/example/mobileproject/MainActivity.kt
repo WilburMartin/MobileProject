@@ -1,6 +1,5 @@
 package com.example.mobileproject
 import adapters.ActivityViewHolder
-import adapters.LocalStorageViewHolder
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -32,7 +31,6 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import data_classes.Geometry
 import data_classes.NearbySearch
 import data_classes.activity
 import kotlinx.android.synthetic.main.activity_main.*
@@ -53,6 +51,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     lateinit var spinner: Spinner
     lateinit var viewModel: ActivityViewModel
     lateinit var weatherView: WeatherViewModel
+    lateinit var image:ImageView
+    lateinit var imagetexts: TextView
     lateinit var localStorageViewModel: LocalActivityViewModel
 
     var placesList: ArrayList<NearbySearch> = ArrayList<NearbySearch>()
@@ -104,8 +104,10 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         val aa = ArrayAdapter(this, android.R.layout.simple_spinner_item, sort)
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(aa);
-
-
+        image = imageView1
+        imagetexts = imagetext
+        image.setImageResource(R.drawable.weathercloud)
+        imagetexts.setText("Weather!")
         requestPermission()
 
         initPlaces()
@@ -216,6 +218,14 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     for(placeLikelihood in sortablePlaces) {
                         likehoods.append(String.format("Place '%s'", placeLikelihood.place.name))
                             .append("\n")
+                    }
+                    if (!outdoorWeather) {
+                        image.setImageResource(R.drawable.bad_weather)
+                        imagetexts.setText("Bad Weather! Stay indoors!")
+                    }
+                    else if (outdoorWeather) {
+                        image.setImageResource(R.drawable.sunshine)
+                        imagetexts.setText("Good Weather! Have fun!")
                     }
                     //edt_place_likelihoods.setText(" ")
                     //edt_place_likelihoods.setText(likehoods.toString())
