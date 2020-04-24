@@ -118,11 +118,11 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         requestPermission()
 
         initPlaces()
-         var sharedPreferences:SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if(sharedPreferences.getBoolean("IS_FIRST_TIME", true)) {
-        getTargetDistance()
-        sharedPreferences.edit().putBoolean("IS_FIRST_TIME", false).apply();
-    }
+//         var sharedPreferences:SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        if(sharedPreferences.getBoolean("IS_FIRST_TIME", true)) {
+//        getTargetDistance()
+//        sharedPreferences.edit().putBoolean("IS_FIRST_TIME", false).apply();
+    //}
         setupCurrentPlace()
 
         setupPlacesAutoComplete(this)
