@@ -216,7 +216,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             placeResponse.addOnCompleteListener {task->
                 if(task.isSuccessful) {
                     val response = task.result
-                    println(response.toString())
                     for (placeLikelihood in response!!.getPlaceLikelihoods()) {
                         if (placeLikelihood.place.name!=null)
                          sortablePlaces.add(placeLikelihood)
@@ -236,14 +235,12 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                         currentLocation.longitude = currentPlaceLong.toDouble()
                     val likehoods = StringBuilder("")
                     getNearbyActivities()
-                   // edt_address.setText(StringBuilder(sortablePlaces[0].place.address!!))
+
 
                     for(placeLikelihood in sortablePlaces) {
                         likehoods.append(String.format("Place '%s'", placeLikelihood.place.name))
                             .append("\n")
                     }
-                    //edt_place_likelihoods.setText(" ")
-                    //edt_place_likelihoods.setText(likehoods.toString())
                 }
                 else {
                     Toast.makeText(this@MainActivity, "Place not found", Toast.LENGTH_SHORT).show()
@@ -336,7 +333,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private fun getNearbyActivities() {
         //set recycler view
         checkWeather();
-
+        placesList.clear()
+        activityList.clear()
         var index = 0;
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.adapter = adapter
@@ -374,7 +372,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 activityList.clear()
                 activityList.addAll(checkSet)
                 index = index + 1
-                println("Index : $index")
                 adapter.notifyDataSetChanged()
                 var stringCoordinates = "$currentPlaceLat,$currentPlaceLong"
                 if (index < searchTypes.size) {
