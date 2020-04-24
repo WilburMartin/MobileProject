@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mobileproject.R
 import com.example.mobileproject.ViewSingleActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import data_classes.Location
 import data_classes.activity
 import local_database.LocalActivityViewModel
 import places_api_setup.ActivityViewModel
@@ -31,7 +32,7 @@ class ActivityViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         activityDistanceView = itemView.findViewById(R.id.activity_distance)
         addButton = itemView.findViewById(R.id.add_button)
     }
-    fun bind(activity: activity, listener: (activity)->Unit) {
+    fun bind( activity: activity, listener: (activity)->Unit) {
         activityNameView.text = activity.name
         activityTypeView.text = activity.type.capitalize()
         activityLocationView.text = activity.formatted_address
@@ -43,6 +44,8 @@ class ActivityViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
             val context = itemView.getContext()
             val intent = Intent(context, ViewSingleActivity::class.java)
             intent!!.putExtra("place_id", activity.place_id)
+            intent!!.putExtra("lat", activity.fromCurrentLocation.latitude)
+            intent!!.putExtra("long", activity.fromCurrentLocation.longitude)
             context.startActivity(intent)
         })
     }

@@ -14,7 +14,8 @@ data class detailsResult(
     val rating: Double,
     val types: List<String>,
     val photos: List<Photo>,
-    val website: String
+    val website: String,
+    val geometry: Geometry
 
 )
 
@@ -36,10 +37,6 @@ data class Review(
     val time: Int
 )
 
-data class detailsLocation(
-    val lat: Double,
-    val lng: Double
-)
 
 data class Viewport(
     val northeast: Northeast,

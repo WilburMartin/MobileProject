@@ -1,11 +1,17 @@
 package com.example.mobileproject
 import adapters.ActivityViewHolder
 import adapters.LocalStorageViewHolder
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager
+import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
@@ -36,6 +42,8 @@ import data_classes.Geometry
 import data_classes.NearbySearch
 import data_classes.activity
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.dialog_view.*
+import kotlinx.android.synthetic.main.dialog_view.view.*
 import local_database.LocalActivityViewModel
 import local_database.localactivity
 import weather_api_setup.CityWeather
@@ -43,12 +51,13 @@ import weather_api_setup.WeatherViewModel
 import java.lang.StringBuilder
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     internal var sort = arrayOf("Distance", "Type")
     lateinit var placesClient:PlacesClient
     var sortablePlaces: ArrayList<PlaceLikelihood> = ArrayList<PlaceLikelihood>()
-  //  lateinit var searchButton: SearchView
+    lateinit var searchButton: SearchView
     lateinit var searchBox: EditText
     lateinit var spinner: Spinner
     lateinit var viewModel: ActivityViewModel
@@ -65,7 +74,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
      var currentPlaceLong = 0.0
     lateinit var currentLocation : Location
     lateinit var adapter: ActivityViewHolder.ActivityItemAdapter
-    internal var searchRadius = "50000"
+    internal var searchRadius = "10000"
     internal var apiKey = "AIzaSyAlI0k8ZhRZuywIpOHH0_9ls5a0JhyF1Pg"
     lateinit var weatherGood:TextView
 
@@ -94,8 +103,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         weatherGood = display_weather
-
-        searchBox= search_box
         goToLocalActivities = findViewById(R.id.go_to_stored)
         viewModel = ViewModelProviders.of(this).get(ActivityViewModel::class.java)
         weatherView = ViewModelProviders.of(this).get(WeatherViewModel::class.java)
@@ -111,10 +118,14 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         requestPermission()
 
         initPlaces()
-
-       // setupPlacesAutoComplete()
-
+         var sharedPreferences:SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if(sharedPreferences.getBoolean("IS_FIRST_TIME", true)) {
+        getTargetDistance()
+        sharedPreferences.edit().putBoolean("IS_FIRST_TIME", false).apply();
+    }
         setupCurrentPlace()
+
+        setupPlacesAutoComplete(this)
 
         if (intent != null && intent.getExtras() != null) {
             reload = intent!!.getBooleanExtra("reload", true)
@@ -126,6 +137,27 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         }
 
     }
+
+
+
+
+    private fun getTargetDistance() {
+        // Opens the dialog view asking the user for their target cals for the day, based on to do app
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_view, null)
+        val alertBuilder = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setTitle("Enter distance")
+        val show = alertBuilder.show()
+        show.submit_distance.setOnClickListener {
+            var distanceHolder = dialogView.target_distance.text.toString()
+            if (!distanceHolder.isNullOrEmpty()) {
+                var distanceNumber = Integer.parseInt(distanceHolder)
+                searchRadius = (distanceNumber * 1600).toString()
+                show.dismiss()
+            }
+        }
+    }
+
 
     private fun partItemClicked(activity: activity) {
         var localactivity= localactivity(activity.name, activity.formatted_address, activity.type, activity.distance)
@@ -172,15 +204,12 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     }
 
     private fun setupCurrentPlace() {
-        if (reload) {
-            placesList.clear()
-            activityList.clear()
-        }
         val request = FindCurrentPlaceRequest.builder(placeFields).build()
         btn_get_current_place.setOnClickListener {
             if(ActivityCompat.checkSelfPermission(this@MainActivity,
                     android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                reload = true
+                placesList.clear()
+                activityList.clear()
                 return@setOnClickListener;
             }
             val placeResponse = placesClient.findCurrentPlace(request)
@@ -202,17 +231,11 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     if (currentPlaceCoordinates!=null)
                         currentPlaceLat=currentPlaceCoordinates.latitude
                         currentPlaceLong=currentPlaceCoordinates.longitude
-                        println("Current coordinates: " + currentPlaceCoordinates)
-
                         currentLocation = Location(" ")
                         currentLocation.latitude = currentPlaceLat.toDouble()
                         currentLocation.longitude = currentPlaceLong.toDouble()
-                    println("Current location: " + currentLocation)
-                     println("Current lat: " + currentPlaceLat)
-                     println("Current long" + currentPlaceLong)
-                    getNearbyActivities()
                     val likehoods = StringBuilder("")
-
+                    getNearbyActivities()
                    // edt_address.setText(StringBuilder(sortablePlaces[0].place.address!!))
 
                     for(placeLikelihood in sortablePlaces) {
@@ -271,123 +294,47 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 weatherStat[3] = true;
             }
         })
-        return outdoorWeather;
-    }
-    private fun checkActivityType(activType: String): Boolean{
-        var outdoorActivit: Boolean = false;
-        outdoorActivit = when(activType) {
-            "accounting" -> false
-            "airport" -> false
-            "amusement_park" -> true
-            "aquarium" -> false
-            "art_gallery" -> false
-            "atm" -> false
-            "bakery" -> false
-            "bank" -> false
-            "bar" -> false
-            "beauty_salon" -> false
-            "bicycle_store" -> false
-            "book_store" -> false
-            "bowling_alley" -> false
-            "bus_station" -> false
-            "cafe" -> false
-            "campground" -> true
-            "car_dealer" -> false
-            "car_rental" -> false
-            "car_repair" -> false
-            "car_wash" -> false
-            "casino" -> false
-            "cemetery" -> true
-            "church" -> false
-            "city_hall" -> false
-            "clothing_store" -> false
-            "convenience_store" -> false
-            "courthouse" -> false
-            "dentist" -> false
-            "department_store" -> false
-            "doctor" -> false
-            "drugstore" -> false
-            "electrician" -> false
-            "electronics_store" -> false
-            "embassy" -> false
-            "fire_station" -> false
-            "florist" -> false
-            "funeral_home" -> false
-            "furniture_store" -> false
-            "gas_station" -> false
-            "grocery_or_supermarket" -> false
-            "gym" -> false
-            "hair_care" -> false
-            "hardware_store" -> false
-            "hindu_temple" -> false
-            "home_goods_store" -> false
-            "hospital" -> false
-            "insurance_agency" -> false
-            "jewelry_store" -> false
-            "laundry" -> false
-            "lawyer" -> false
-            "library" -> false
-            "light_rail_station" -> false
-            "liquor_store" -> false
-            "local_government_office" -> false
-            "locksmith" -> false
-            "lodging" -> false
-            "meal_delivery" -> false
-            "meal_takeaway" -> false
-            "mosque" -> false
-            "movie_rental" -> false
-            "movie_theater" -> false
-            "moving_company" -> false
-            "museum" -> false
-            "night_club" -> false
-            "painter" -> false
-            "park" -> true
-            "parking" -> false
-            "pet_store" -> false
-            "pharmacy" -> false
-            "physiotherapist" -> false
-            "plumber" -> false
-            "police" -> false
-            "post_office" -> false
-            "primary_school" -> false
-            "real_estate_agency" -> false
-            "restaurant" -> false
-            "roofing_contractor" -> false
-            "rv_park" -> false
-            "school" -> false
-            "secondary_school" -> false
-            "shoe_store" -> false
-            "shopping_mall" -> false
-            "spa" -> false
-            "stadium" -> false
-            "storage" -> false
-            "store" -> false
-            "subway_station" -> false
-            "supermarket" -> false
-            "synagogue" -> false
-            "taxi_stand" -> false
-            "tourist_attraction" -> false
-            "train_station" -> false
-            "transit_station" -> false
-            "travel_agency" -> false
-            "university" -> false
-            "veterinary_care" -> false
-            "zoo" -> true
-            else -> false
-        }
         if (outdoorWeather == true) {
             weatherGood.text = "Weather good for outside activities today"
         }
         else{
             weatherGood.text = "Indoor activities better today"
         }
-        return outdoorActivit;
+        return outdoorWeather;
+    }
 
+    private fun getActivityList(): Array<Pair<String,Boolean>>{
+        return arrayOf<Pair<String, Boolean>>(
+            Pair("amusement_park", true),
+            Pair("aquarium" , false),
+            Pair("art_gallery" , false),
+            Pair("bakery", false),
+            Pair("bar", false),
+            Pair("beauty_salon" , false),
+            Pair("book_store" , false),
+            Pair("bowling_alley", false),
+            Pair("cafe", false),
+            Pair("campground", false),
+            Pair("casino", false),
+            Pair("clothing_store" , false),
+            Pair("department_store", false),
+            Pair("library", false),
+            Pair("movie_theater", false),
+            Pair("museum", false),
+            Pair("night_club", false),
+            Pair("park", false),
+            Pair("restaurant", false),
+            Pair("shopping_mall", false),
+            Pair("spa", false),
+            Pair("stadium", false),
+            Pair("store", false),
+            Pair("tourist_attraction", false),
+            Pair("zoo", true)
+        )
     }
 
     private fun getNearbyActivities() {
         //set recycler view
-        //placesList.clear()
         checkWeather();
 
         var index = 0;
@@ -395,9 +342,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         recyclerView.adapter = adapter
         var layoutManager: LinearLayoutManager = LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        var searchTypes :ArrayList<String> = ArrayList<String>()
-        searchTypes.add("restaurant")
-        searchTypes.add("park")
+        var searchTypes :Array<Pair<String, Boolean>> = getActivityList()
         if (currentPlaceCoordinates != null) {
             viewModel.placesList.observe(this, Observer { places ->
                 placesList.add(places)
@@ -408,76 +353,83 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                         var calcLocation = Location(" ")
                         calcLocation.latitude = placeLat
                         calcLocation.longitude = placeLong
-                        var distanceInMilesFloat = (currentLocation.distanceTo(calcLocation)/1609);
+                        var distanceInMilesFloat =
+                            (currentLocation.distanceTo(calcLocation) / 1609);
                         var distanceInMiles = "%.2f".format(distanceInMilesFloat).toDouble()
-                        println("Distance in miles: " + distanceInMiles)
-                        var activity = activity(result.name, result.types.component1(), result.vicinity, distanceInMiles, result.place_id)
+                        var activity = activity(
+                            result.name,
+                            result.types.component1().replace('_', ' '),
+                            result.vicinity,
+                            distanceInMiles,
+                            result.place_id,
+                            currentLocation
+                        )
+                        activityList.add(activity)
 
 
-                        var outdoorActivit = false;
-                        outdoorActivit = checkActivityType(activity.type);
-                        if(!outdoorActivit || outdoorWeather){
-                            activityList.add(activity)
-                        }
 
-
-                      //activityList.add(activity)
-                        println(activityList.toString())
                     }
                 }
+                var checkSet: HashSet<activity> = HashSet<activity>(activityList)
+                activityList.clear()
+                activityList.addAll(checkSet)
                 index = index + 1
                 println("Index : $index")
                 adapter.notifyDataSetChanged()
                 var stringCoordinates = "$currentPlaceLat,$currentPlaceLong"
                 if (index < searchTypes.size) {
-                viewModel.getNearbySearch(stringCoordinates, searchRadius, searchTypes[index], apiKey)
+                    if (outdoorWeather && searchTypes[index].second ) {
+                        viewModel.getNearbySearch(
+                            stringCoordinates,
+                            searchRadius,
+                            searchTypes[index].first,
+                            apiKey
+                        )
+                    }
+                        if ((!outdoorWeather || outdoorWeather) && !searchTypes[index].second) {
+                            viewModel.getNearbySearch(
+                                stringCoordinates,
+                                searchRadius,
+                                searchTypes[index].first,
+                                apiKey
+                            )
+                        }
+                    if (!outdoorWeather && searchTypes[index].second) {
+                        index = index + 1
+                    }
+
                 }
             })
             var stringCoordinates = "$currentPlaceLat,$currentPlaceLong"
             //autofill the recycler view on creation
-            viewModel.getNearbySearch(stringCoordinates, searchRadius, searchTypes[0], apiKey)
-
-            var numberOfObjects = searchTypes.size
-
+            viewModel.getNearbySearch(stringCoordinates, searchRadius, searchTypes[0].first, apiKey)
 
             }
 
-           var stringCoordinates = "$currentPlaceLat,$currentPlaceLong"
-            //click listener for when search button is pressed from edit text
-            searchBox.setOnEditorActionListener() { v, actionId, event ->
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    placesList.clear()
-                    activityList.clear()
-                    val input: String = searchBox.text.toString()
-                    viewModel!!.getNearbySearch(stringCoordinates, searchRadius, input, apiKey)
-                    true
-                }
-                false
+
+    }
+
+    private fun setupPlacesAutoComplete(context: Context) {
+        val autocompleteFragment = supportFragmentManager
+            .findFragmentById(R.id.fragment_place) as AutocompleteSupportFragment
+        autocompleteFragment.setPlaceFields(placeFields)
+
+        autocompleteFragment.setOnPlaceSelectedListener(object:PlaceSelectionListener{
+            override fun onPlaceSelected(p0: Place) {
+                val intent = Intent(context, ViewSingleActivity::class.java)
+                intent.putExtra("place_id", p0.id)
+                intent.putExtra("lat", currentPlaceLat)
+                intent.putExtra("long", currentPlaceLong)
+                startActivity(intent)
 
             }
-        }
 
+            override fun onError(p0: Status) {
+                Toast.makeText(this@MainActivity,"" + p0.statusMessage, Toast.LENGTH_SHORT).show()
+            }
 
-
-
-
-
-//    private fun setupPlacesAutoComplete() {
-//        val autocompleteFragment = supportFragmentManager
-//            .findFragmentById(R.id.fragment_place) as AutocompleteSupportFragment
-//        autocompleteFragment.setPlaceFields(placeFields)
-//
-//        autocompleteFragment.setOnPlaceSelectedListener(object:PlaceSelectionListener{
-//            override fun onPlaceSelected(p0: Place) {
-//                Toast.makeText(this@MainActivity,"" + p0.address, Toast.LENGTH_SHORT).show()
-//            }
-//
-//            override fun onError(p0: Status) {
-//                Toast.makeText(this@MainActivity,"" + p0.statusMessage, Toast.LENGTH_SHORT).show()
-//            }
-//
-//        })
-//    }
+        })
+    }
 
     private fun initPlaces() {
         Places.initialize(this,apiKey)

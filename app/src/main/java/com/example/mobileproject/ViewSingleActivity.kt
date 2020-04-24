@@ -1,13 +1,16 @@
 package com.example.mobileproject
 
 import android.content.Intent
+import android.location.Location
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.squareup.picasso.Picasso
 import data_classes.detailsResult
@@ -31,8 +34,12 @@ class ViewSingleActivity:AppCompatActivity() {
         lateinit var localViewModel: LocalActivityViewModel
         var photoref=" "
         var placeid = " "
+        var currentLocation: Location = Location(" ")
+        var currentPlaceLat = 0.0
+        var currentPlaceLong = 0.0
+
         internal var apiKey = "AIzaSyAlI0k8ZhRZuywIpOHH0_9ls5a0JhyF1Pg"
-        internal var fields = "formatted_address,name,photo,type,website,opening_hours,website,formatted_phone_number"
+        internal var fields = "formatted_address,name,photo,type,website,opening_hours,website,formatted_phone_number,geometry"
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
@@ -55,10 +62,22 @@ class ViewSingleActivity:AppCompatActivity() {
 
             if (intent != null && intent.getExtras() != null) {
                  placeid = intent!!.getStringExtra("place_id")
+                 currentPlaceLat=intent!!.getDoubleExtra("lat",0.0)
+                 currentPlaceLong = intent!!.getDoubleExtra("long",0.0)
+
+                 currentLocation.latitude= currentPlaceLat
+                 currentLocation.longitude = currentPlaceLong
+
             }
             viewModel!!.locationQuery(placeid, apiKey, fields)
 
+            var name = " "
+            var type =  " "
+            var address = " "
+            var distance = 0.0
+
             viewModel.singlePlace.observe(this, Observer{
+
                 activityNameView.text = it.result.name
                 photoref =it.result.photos[0].photo_reference
                 var photoURL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${it.result.photos[0].photo_reference}&key=$apiKey"
@@ -68,27 +87,31 @@ class ViewSingleActivity:AppCompatActivity() {
                 openNowView.text = "Open now?: " + it.result.opening_hours.open_now.toString().capitalize()
                 websiteView.text = "Website: " + it.result.website
                 phoneView.text = "Phone number: " + it.result.formatted_phone_number
+                var latGeometry = it.result.geometry.location.lat
+                var longGeometry = it.result.geometry.location.lng
+                var calcLocation = Location(" ")
+                calcLocation.latitude = latGeometry
+                calcLocation.longitude = longGeometry
+                var distanceInMilesFloat =
+                    (currentLocation.distanceTo(calcLocation) / 1609);
+                var distanceInMiles = "%.2f".format(distanceInMilesFloat).toDouble()
+                distanceView.text = "Distance : " + distanceInMiles + " miles away"
+                name = it.result.name
+                type = it.result.types[0]
+                address = it.result.formatted_address
+                distance = distanceInMiles
 
             })
 
-
-
-
-//                Picasso.get().load(it.album.cover).into(trackPicture)
-//                trackNameView.text = it.title
-//                trackAlbumView.text = it.album.title
-//                trackArtistView.text = "Artists: " + it.artist.name
-//                trackPositionView.text = "Position: " + it.track_position.toString()
-//                trackLengthView.text = "Song length: " + it.duration.toString()
-//                trackReleaseDateView.text = "Release date: " + it.release_date
-//                trackRankView.text = "Song rank: " + it.rank.toString()
-//                trackGainView.text = "Song gain: " + it.gain.toString()
-
-
             backButton.setOnClickListener() {
                 val intent = Intent(this, MainActivity::class.java)
-                intent!!.putExtra("reload", false)
                 startActivity(intent)
+            }
+
+            add_button.setOnClickListener() {
+                var adder:localactivity = localactivity(name, address, type, distance)
+                localViewModel!!.insert(adder)
+                Toast.makeText(this, "Activity stored", Toast.LENGTH_SHORT)
             }
         }
     }

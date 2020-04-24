@@ -12,12 +12,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         >
-<!--        <fragment-->
-<!--            android:id="@+id/fragment_place"-->
-<!--            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content">-->
-<!--        </fragment>-->
+        <fragment
+            android:id="@+id/fragment_place"
+            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </fragment>
 
         <Button
             android:id="@+id/btn_get_current_place"
@@ -67,27 +67,8 @@
 
 
 
-            <EditText
-                android:id="@+id/search_box"
-                android:layout_width="200dp"
-                android:layout_height="39dp"
-                android:layout_marginStart="6dp"
-                android:layout_marginLeft="6dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="6dp"
-                android:layout_marginRight="6dp"
-                android:layout_marginBottom="58dp"
-                android:ems="10"
-                android:hint="Search activities"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                />
 
-            <SearchView
-                android:layout_width="45dp"
-                android:layout_height="39dp"
-                android:id="@+id/search_button" android:layout_marginLeft="6dp" android:layout_marginStart="6dp"
-                />
+
             <Spinner
                 android:layout_width="100dp"
                 android:layout_height="39dp"
